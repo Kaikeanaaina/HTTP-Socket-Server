@@ -2,82 +2,88 @@
 var net = require('net');
 //this allows us to use the module
 var querystring = require('querystring');
-
 //ask Net module for new Server also setting what happens when client connects
 var server = net.createServer(whenSomeoneConnects);
-
 //file system
 var fs = require('fs');
 
 function whenSomeoneConnects(socketReq){
   console.log('SOMEONE CONNECTED TO MY SERVER');
-  //console.log(socketReq);
-
-
-
-
    socketReq.on('data',function(buffer){
-
     // this is the the request
     //it is an array of strings
     //(buffer.toString().split('\n'));
 
-    //console.log(buffer.toString().split('\n')[0].split(' '));
+    var status = buffer.toString().split('\n')[0];
+    var splitStatus = buffer.toString().split('\n')[0].split(' ');
+    var uri = splitStatus[1];
+    var date = new Date();
+    console.log(uri);
 
-    var firstHeader = buffer.toString().split('\n')[0];
-    console.log(firstHeader);
+    var notFound = function(){
+        socketReq.write('HTTP/1.1 404 Not Found'+'\n');
+        socketReq.write('Server: kanakaHacks'+'\n');
+        socketReq.write('Date: '+ date+'\n');
+        socketReq.write('Content-Type : text/html; charset=uft-8'+'\n');
+        socketReq.write('Connection: keep-alive'+'\n\n');
+        socketReq.write(' ');
 
-    var splitFirstHeader = buffer.toString().split('\n')[0].split(' ');
-    console.log(splitFirstHeader);
+      fs.readFile('./../html/404.html', function (err, data) {
+        if(err) throw err;
+        socketReq.write(data);
+        return socketReq.end();
+      });
+    };
 
-    if(splitFirstHeader[0] === 'GET'){
-      if(splitFirstHeader[1]=== '/'){
-
-        //1. status
-        socketReq.write('200'+'\n');
-
-        //2. headings
-          //Content-Type: html/js/json
-        socketReq.write('Content-Type : html'+'\n');
-
-          //Content-Length: ------
-        socketReq.write('Content-Length : 50'+'\n\n');
-
-        //3.body
-        socketReq.write('');
+    if(uri=== '/css/styles.css'|| uri==='/css'){
+      fs.readFile('./..'+uri, function (err, data) {
+      if (err) {
+        notFound();
       }
+      else{
+      //1. status
+      socketReq.write('HTTP/1.1 200 OK'+'\n');
+      // //2. headings
+      //   //Content-Type: html/js/json
+      socketReq.write('Server: kanakaHacks'+'\n');
+      socketReq.write('Date: '+ date+'\n');
+      socketReq.write('Content-Type : text/html; charset=uft-8'+'\n');
+      socketReq.write('Connection: keep-alive'+'\n\n');
+      socketReq.write(' ');
 
-      else if(splitFirstHeader[1]=== '/index.html'){
-        socketReq.write('hawaii');
+        socketReq.write(data);
+        return socketReq.end();
       }
-
-
+    });
     }
 
-    // if(){
+    else{
+      if(uri==='/'){
+        uri='/index.html';
+      }
 
-    // }
+      fs.readFile('./../html'+uri, function (err, data) {
+        if (err) {
+          notFound();
+        }
+        else{
+        //1. status
+        socketReq.write('HTTP/1.1 200 OK'+'\n');
+        // //2. headings
+        //   //Content-Type: html/js/json
+        socketReq.write('Server: kanakaHacks'+'\n');
+        socketReq.write('Date: '+ date+'\n');
+        socketReq.write('Content-Type : text/html; charset=uft-8'+'\n');
+        socketReq.write('Connection: keep-alive'+'\n\n');
+        socketReq.write(' ');
 
-
-    // socketReq.write(buffer);
-    // socketReq.write('aloooooooha');
-    //     console.log(buffer);
-    //     console.log('=============================');
-    //     console.log(buffer.toString().split('\n'));
-    // // socketReq.write('hello, its me youre looking for');
-    // //   socketReq.write('\n\n');
-    // // socketReq.write('HTTP Headers : Standard');
-    // //   socketReq.write('\n\n');
-    // // socketReq.write('src="./index.html"');
-    socketReq.end();
+          socketReq.write(data);
+          return socketReq.end();
+        }
+      });
+    }
 
   });
-
-
-
-
-
-
 }
 
 
