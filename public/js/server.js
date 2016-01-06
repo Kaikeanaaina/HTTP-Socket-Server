@@ -27,11 +27,10 @@ function whenSomeoneConnects(socketReq){
         socketReq.write('Content-Type : text/html; charset=uft-8'+'\n');
         socketReq.write('Connection: keep-alive'+'\n\n');
         socketReq.write(' ');
-
       fs.readFile('./../html/404.html', function (err, data) {
         if(err) throw err;
         socketReq.write(data);
-        return socketReq.end();
+        //return socketReq.end();
       });
     };
 
@@ -52,7 +51,7 @@ function whenSomeoneConnects(socketReq){
       socketReq.write(' ');
 
         socketReq.write(data);
-        return socketReq.end();
+        //return socketReq.end();
       }
     });
     }
@@ -78,7 +77,7 @@ function whenSomeoneConnects(socketReq){
         socketReq.write(' ');
 
           socketReq.write(data);
-          return socketReq.end();
+          //return socketReq.end();
         }
       });
     }
